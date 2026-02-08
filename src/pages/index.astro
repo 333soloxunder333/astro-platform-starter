@@ -7,7 +7,7 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width" />
     <title>AMS01 - Perfil</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
 </head>
 <body>
 
@@ -29,7 +29,8 @@
         </div>
 
         <div class="social-links">
-            <a href="https://www.instagram.com/xunder999?igsh=ZXR3N3luNTh0eWxm" target="_blank"><i class="fa-brands fa-x-twitter"></i></a> <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
+            <a href="https://www.instagram.com/xunder999?igsh=ZXR3N3luNTh0eWxm" target="_blank"><i class="fa-brands fa-instagram"></i></a>
             <a href="#" target="_blank"><i class="fa-brands fa-github"></i></a>
             <a href="#" target="_blank"><i class="fa-brands fa-twitch"></i></a>
         </div>
@@ -47,54 +48,36 @@
         const canvas = document.getElementById('matrix-bg');
         const ctx = canvas.getContext('2d');
 
-        // Ajustar el canvas al tamaño de la pantalla
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
 
-        // Caracteres que caerán (mezcla de katakana, números y letras)
         const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズブヅプエェケセテネヘメレゲゼデベペオォコソトノホモヨョロゴゾドボポヴッン0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
         const charArray = chars.split('');
 
         const fontSize = 14;
-        const columns = canvas.width / fontSize; // Número de columnas
+        const columns = canvas.width / fontSize;
 
-        // Un array para guardar la posición Y de cada columna
         const drops = [];
-        for(let i = 0; i < columns; i++) {
-            drops[i] = 1;
-        }
+        for(let i = 0; i < columns; i++) { drops[i] = 1; }
 
         function draw() {
-            // Pintar el fondo de negro semi-transparente para crear el efecto de "estela"
-            // En vez de verde, usamos negro puro (0,0,0)
             ctx.fillStyle = 'rgba(0, 0, 0, 0.05)'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Color del texto (BLANCO para el efecto B&W)
             ctx.fillStyle = '#FFFFFF'; 
             ctx.font = fontSize + 'px monospace';
 
-            // Bucle para pintar las gotas
-            for(let i = 0; i < drops.length; i++)
-            {
-                // Elegir un carácter al azar
+            for(let i = 0; i < drops.length; i++) {
                 const text = charArray[Math.floor(Math.random() * charArray.length)];
-                // Dibujar el carácter
                 ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-
-                // Enviar la gota arriba de nuevo al azar cuando sale de la pantalla
                 if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
                     drops[i] = 0;
-
-                // Incrementar la posición Y
                 drops[i]++;
             }
         }
 
-        // Animar cada 33 milisegundos
         setInterval(draw, 33);
 
-        // Si giran el móvil, reajustar el tamaño
         window.addEventListener('resize', () => {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
@@ -113,33 +96,20 @@
             background-color: #000;
         }
 
-        /* ESTILOS DEL NUEVO CANVAS MATRIX */
         #matrix-bg {
-            position: fixed;
-            top: 0; left: 0;
-            z-index: -2; /* Al fondo del todo */
-            background: black;
+            position: fixed; top: 0; left: 0; z-index: -2; background: black;
         }
 
-        /* Capa un poco menos oscura para que se vea el código blanco */
         .overlay {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.3); /* Solo un 30% de oscuridad */
-            z-index: -1;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.3); z-index: -1;
         }
 
-        /* TARJETA (Igual que antes) */
         .card {
             background: rgba(20, 20, 20, 0.85);
-            padding: 40px;
-            border-radius: 20px;
-            text-align: center;
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            width: 90%; /* Un poco más ancho en móviles */
-            max-width: 380px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.8);
+            padding: 40px; border-radius: 20px; text-align: center;
+            backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 90%; max-width: 380px; box-shadow: 0 0 30px rgba(0,0,0,0.8);
         }
 
         .avatar-container {
@@ -147,7 +117,7 @@
         }
         .avatar {
             width: 120px; height: 120px; border-radius: 50%; object-fit: cover;
-            border: 3px solid #ffffff; /* Borde blanco para destacar más */
+            border: 3px solid #ffffff;
         }
         .status-indicator {
             position: absolute; bottom: 5px; right: 5px; width: 25px; height: 25px;
@@ -171,8 +141,7 @@
         .social-links a:hover { color: white; transform: scale(1.1); }
 
         .music-player {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px; border-radius: 10px; margin-top: 20px;
+            background: rgba(255, 255, 255, 0.05); padding: 15px; border-radius: 10px; margin-top: 20px;
         }
         .music-player p { font-size: 0.8rem; margin-bottom: 10px; color: #ddd; }
         audio {
