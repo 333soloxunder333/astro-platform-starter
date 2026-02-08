@@ -1,19 +1,185 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Markdown from '../components/Markdown.astro';
-
-const explainer = `
-An Astro website can go way beyond static pages - on the right platform.
-
-Netlify supports not only [Streaming SSR](https://docs.astro.build/en/guides/server-side-rendering/#html-streaming) and fast [Edge Middleware](https://docs.astro.build/en/guides/middleware/), but also [on-demand revalidation](https://www.netlify.com/blog/cache-tags-and-purge-api-on-netlify/) and [stale-while-revalidate](https://www.netlify.com/blog/swr-and-fine-grained-cache-control/). 
-Any page or data can be rebuilt only when needed, without site visitors ever getting a performance hit.
-`;
+// src/pages/index.astro
 ---
 
-<Layout title="Welcome to Astro.">
-    <h1 class="mb-10">Netlify Platform Starter for Astro</h1>
-    <Markdown content={explainer} class="mb-10 text-lg" />
-    <p>
-        <a href="https://docs.netlify.com/frameworks/astro/" class="btn btn-lg sm:min-w-64">Read the Docs</a>
-    </p>
-</Layout>
+<html lang="es">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>AMS01 - Perfil</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" />
+</head>
+<body>
+
+    <video autoplay loop muted playsinline id="video-bg">
+        <source src="/fondo.mp4" type="video/mp4">
+    </video>
+
+    <div class="overlay"></div>
+
+    <main class="card">
+        
+        <div class="avatar-container">
+            <img src="/perfil.jpg" alt="Mi Foto" class="avatar">
+            <div class="status-indicator online" title="En línea en Discord"></div>
+        </div>
+
+        <h1>AMS01</h1>
+        
+        <div class="discord-status">
+            <i class="fa-brands fa-discord"></i> Jugando a VS Code
+        </div>
+
+        <div class="social-links">
+            <a href="#" target="_blank"><i class="fa-brands fa-twitter"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-instagram"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-twitch"></i></a>
+        </div>
+
+        <div class="music-player">
+            <p>🎵 Now Playing: Mi Canción Favorita</p>
+            <audio controls>
+                <source src="/cancion.mp3" type="audio/mpeg">
+                Tu navegador no soporta el elemento de audio.
+            </audio>
+        </div>
+
+    </main>
+
+    <style>
+        /* RESET BÁSICO */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: white;
+            height: 100vh;
+            display: flex;
+            justify-content: center; /* Centrar horizontalmente */
+            align-items: center;     /* Centrar verticalmente */
+            overflow: hidden;        /* Evitar scroll */
+            background-color: #000;
+        }
+
+        /* FONDO DE VIDEO */
+        #video-bg {
+            position: fixed;
+            right: 0; bottom: 0;
+            min-width: 100%; min-height: 100%;
+            z-index: -2; /* Detrás de todo */
+            object-fit: cover;
+            filter: blur(3px); /* Un poco de desenfoque para que destaque el texto */
+        }
+
+        /* CAPA OSCURA SEMITRANSPARENTE */
+        .overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6); /* Oscuridad al 60% */
+            z-index: -1;
+        }
+
+        /* LA TARJETA DEL PERFIL */
+        .card {
+            background: rgba(20, 20, 20, 0.85); /* Fondo oscuro semitransparente */
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            backdrop-filter: blur(10px); /* Efecto vidrio esmerilado */
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            width: 350px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.5);
+            animation: fadeIn 1.5s ease-out;
+        }
+
+        /* IMAGEN Y ESTADO */
+        .avatar-container {
+            position: relative;
+            width: 120px;
+            margin: 0 auto 20px;
+        }
+        
+        .avatar {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%; /* Círculo perfecto */
+            object-fit: cover;
+            border: 3px solid #7289da; /* Color Discord */
+        }
+
+        .status-indicator {
+            position: absolute;
+            bottom: 5px;
+            right: 5px;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 3px solid #1a1a1a;
+        }
+        .online { background-color: #43b581; } /* Verde Discord */
+        .dnd { background-color: #f04747; }    /* Rojo No Molestar */
+
+        /* TEXTOS */
+        h1 { margin-bottom: 10px; font-size: 2rem; }
+        
+        .discord-status {
+            color: #b9bbbe;
+            margin-bottom: 20px;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        /* REDES SOCIALES */
+        .social-links {
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .social-links a {
+            color: white;
+            font-size: 1.5rem;
+            transition: color 0.3s, transform 0.3s;
+        }
+
+        .social-links a:hover {
+            color: #7289da;
+            transform: translateY(-3px);
+        }
+
+        /* REPRODUCTOR PERSONALIZADO */
+        .music-player {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+
+        .music-player p {
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+            color: #ddd;
+        }
+
+        audio {
+            width: 100%;
+            height: 30px;
+            /* Invertir colores para que el reproductor nativo se vea oscuro */
+            filter: invert(1) hue-rotate(180deg); 
+            opacity: 0.8;
+            border-radius: 5px;
+        }
+
+        /* ANIMACIÓN DE ENTRADA */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</body>
+</html>
