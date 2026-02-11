@@ -18,8 +18,8 @@
     <audio id="bg-music" preload="auto"></audio>
 
     <div class="spotify-widget" id="spotify-widget">
-        <div class="spotify-icon" id="album-icon-container">
-            <i class="fa-brands fa-spotify" id="album-icon"></i>
+        <div class="spotify-cover-container" id="album-cover-container">
+            <img src="" id="album-cover" alt="Album Art">
         </div>
         
         <div class="spotify-content">
@@ -86,26 +86,22 @@
     </footer>
 
     <script>
-        // 1. CONFIGURACIÓN
+        // 1. CONFIGURACIÓN DE CANCIONES E IMÁGENES
+        // ¡CAMBIA LOS NOMBRES Y RUTAS AQUÍ!
         const playlist = [
             {
-                title: "Vibe Coding", 
-                artist: "AMS01 Radio", 
-                file: "/cancion.mp3",
-                icon: "fa-solid fa-laptop-code" 
+                title: "Nombre Canción 1", 
+                artist: "Artista 1", 
+                file: "/cancion.mp3",       // Archivo de audio en carpeta public
+                image: "/cover1.jpg"        // Imagen en carpeta public
             },
             {
-                title: "Night City", 
-                artist: "Synthwave Mix", 
+                title: "Nombre Canción 2", 
+                artist: "Artista 2", 
                 file: "/cancion2.mp3",
-                icon: "fa-solid fa-city" 
+                image: "/cover2.jpg"
             },
-            {
-                title: "Cyber Link", 
-                artist: "Neural Network", 
-                file: "/cancion3.mp3",
-                icon: "fa-solid fa-network-wired" 
-            }
+            // Puedes añadir más bloques {} aquí
         ];
 
         // 2. FUNCIÓN MATRIX
@@ -113,7 +109,6 @@
             const canvas = document.getElementById('matrix-bg');
             if (!canvas) return;
             
-            // Forzamos el tipo any para evitar errores de compilación estricta en Netlify
             const ctx = (canvas as any).getContext('2d');
             if (!ctx) return;
 
@@ -146,23 +141,23 @@
             });
         }
 
-        // 3. FUNCIÓN REPRODUCTOR
+        // 3. FUNCIÓN REPRODUCTOR CON IMÁGENES
         function initPlayer() {
             const audio = document.getElementById('bg-music');
             const widget = document.getElementById('spotify-widget');
             const titleEl = document.getElementById('track-title');
             const artistEl = document.getElementById('track-artist');
-            const iconEl = document.getElementById('album-icon');
-            const iconContainer = document.getElementById('album-icon-container');
+            const coverEl = document.getElementById('album-cover'); // La imagen
+            const coverContainer = document.getElementById('album-cover-container');
+            
             const playBtn = document.getElementById('play-btn');
             const prevBtn = document.getElementById('prev-btn');
             const nextBtn = document.getElementById('next-btn');
 
-            if (!audio || !widget || !titleEl || !artistEl || !iconEl || !playBtn) return;
+            if (!audio || !widget || !titleEl || !artistEl || !coverEl || !playBtn) return;
 
             let currentSongIndex = 0;
             let isPlaying = false;
-            // Volumen inicial
             (audio as any).volume = 0.5;
 
             function loadSong(index) {
@@ -173,14 +168,14 @@
                 titleEl.textContent = song.title;
                 artistEl.textContent = song.artist;
                 
-                // Icono
-                iconEl.className = song.icon;
+                // CAMBIAMOS LA IMAGEN
+                (coverEl as any).src = song.image;
                 
-                // Animación
-                if (iconContainer) {
-                    iconContainer.classList.remove('pop-anim');
-                    void iconContainer.offsetWidth; // Trigger reflow
-                    iconContainer.classList.add('pop-anim');
+                // Animación de la carátula
+                if (coverContainer) {
+                    coverContainer.classList.remove('pop-anim');
+                    void coverContainer.offsetWidth; 
+                    coverContainer.classList.add('pop-anim');
                 }
             }
 
@@ -223,16 +218,13 @@
                 if(isPlaying) (audio as any).play().catch(()=>{});
             }
 
-            // Eventos
             playBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
             nextBtn.addEventListener('click', (e) => { e.stopPropagation(); next(); });
             prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prev(); });
             audio.addEventListener('ended', next);
 
-            // Cargar inicial
             loadSong(currentSongIndex);
 
-            // Autoplay intento
             const tryPlay = () => {
                 (audio as any).play().then(() => {
                     isPlaying = true;
@@ -247,7 +239,6 @@
             document.addEventListener('keydown', tryPlay);
         }
 
-        // 4. INICIALIZAR TODO
         initMatrix();
         initPlayer();
 
@@ -279,7 +270,7 @@
             background: rgba(0, 0, 0, 0.3); z-index: -1;
         }
 
-        /* WIDGET */
+        /* --- WIDGET --- */
         .spotify-widget {
             position: fixed;
             bottom: 20px;
@@ -295,8 +286,8 @@
             z-index: 1000;
             box-shadow: 0 5px 20px rgba(0,0,0,0.6);
             transition: all 0.3s ease;
-            max-width: 300px;
-            min-width: 240px;
+            max-width: 320px;
+            min-width: 250px;
         }
 
         .spotify-widget:hover {
@@ -304,14 +295,22 @@
             transform: translateY(-2px);
         }
 
-        .spotify-icon {
-            font-size: 1.8rem;
-            color: #1DB954;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            width: 40px; 
-            height: 40px;
+        /* Contenedor de la Portada */
+        .spotify-cover-container {
+            width: 45px; 
+            height: 45px;
+            border-radius: 6px;
+            overflow: hidden; /* Recorta la imagen si es muy grande */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            flex-shrink: 0; /* Evita que se aplaste */
+        }
+
+        /* La imagen en sí */
+        .spotify-cover-container img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover; /* Mantiene la proporción llenando el cuadro */
+            display: block;
         }
 
         .pop-anim {
@@ -327,6 +326,7 @@
             flex-direction: column;
             flex-grow: 1;
             gap: 4px;
+            min-width: 0; /* Permite que el texto se corte con ... */
         }
 
         .spotify-info {
@@ -341,7 +341,6 @@
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
-            max-width: 140px;
         }
 
         .song-artist {
@@ -399,7 +398,7 @@
             50% { height: 12px; }
         }
 
-        /* CARDS */
+        /* RESTO DE ESTILOS */
         .card {
             background: rgba(20, 20, 20, 0.85);
             border-radius: 20px;
