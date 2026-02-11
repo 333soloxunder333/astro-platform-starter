@@ -58,7 +58,7 @@
             <a href="https://www.instagram.com/xunder999?igsh=ZXR3N3luNTh0eWxm" target="_blank">
                 <i class="fa-brands fa-instagram"></i>
             </a>
-            <a href="https://github.com/333soloxunder333" target="_blank"><i class="fa-brands fa-github"></i></a>
+            <a href="#" target="_blank"><i class="fa-brands fa-github"></i></a>
             <a href="#" target="_blank"><i class="fa-brands fa-twitch"></i></a>
         </div>
 
@@ -101,46 +101,120 @@
             }
         ];
 
-        // Esperar a que la página cargue completamente para evitar errores
         document.addEventListener('DOMContentLoaded', () => {
             
-            // --- 1. FONDO MATRIX ---
+            // --- 1. FONDO MATRIX AGUJERO NEGRO (Optimizado) ---
             const canvas = document.getElementById('matrix-bg');
-            // Verificamos si existe el canvas antes de continuar
             if (canvas) {
                 const ctx = canvas.getContext('2d');
                 if (ctx) {
-                    canvas.width = window.innerWidth;
-                    canvas.height = window.innerHeight;
-
-                    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    // Configuración inicial
+                    let w = canvas.width = window.innerWidth;
+                    let h = canvas.height = window.innerHeight;
+                    let centerX = w / 2;
+                    let centerY = h / 2;
+                    
+                    // Caracteres Matrix
+                    const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズブヅプ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
                     const charArray = chars.split('');
                     const fontSize = 14;
-                    const columns = canvas.width / fontSize;
-                    const drops = [];
-                    for(let i = 0; i < columns; i++) { drops[i] = 1; }
 
-                    function draw() {
-                        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                        ctx.fillRect(0, 0, canvas.width, canvas.height);
-                        ctx.fillStyle = '#FFFFFF'; 
-                        ctx.font = fontSize + 'px monospace';
-                        for(let i = 0; i < drops.length; i++) {
-                            const text = charArray[Math.floor(Math.random() * charArray.length)];
-                            ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-                            if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
-                            drops[i]++;
+                    // Sistema de partículas (Gotas)
+                    // Cantidad limitada para rendimiento (300 está bien para móvil/desktop)
+                    const numDrops = 300; 
+                    const drops = [];
+
+                    class Drop {
+                        constructor() {
+                            this.reset(true);
+                        }
+                        reset(initial = false) {
+                            // Radio inicial: empezar fuera de la pantalla o esparcidos
+                            const maxRadius = Math.sqrt(w*w + h*h) / 2;
+                            this.radius = initial ? Math.random() * maxRadius : maxRadius + Math.random() * 100;
+                            // Ángulo aleatorio alrededor del centro
+                            this.angle = Math.random() * Math.PI * 2;
+                            // Velocidad de caída hacia el centro
+                            this.speed = 2 + Math.random() * 3;
+                            // Carácter aleatorio
+                            this.char = charArray[Math.floor(Math.random() * charArray.length)];
+                            // Color verde Matrix
+                            this.color = '#0F0';
+                        }
+                        update() {
+                            // Mover hacia el centro (reducir radio)
+                            this.radius -= this.speed;
+                            
+                            // Aumentar velocidad al acercarse (efecto gravedad)
+                            this.speed += 0.05;
+
+                            // Girar más rápido al acercarse (conservación momento angular simulada)
+                            // Cuanto menor el radio, mayor el incremento del ángulo
+                            this.angle += 0.02 + (5 / (this.radius + 10));
+
+                            // Calcular posición X, Y basada en radio y ángulo
+                            this.x = centerX + Math.cos(this.angle) * this.radius;
+                            this.y = centerY + Math.sin(this.angle) * this.radius;
+
+                            // Cambiar carácter aleatoriamente a veces para el efecto "glitch"
+                            if(Math.random() > 0.95) {
+                                this.char = charArray[Math.floor(Math.random() * charArray.length)];
+                            }
+
+                            // Si llega al centro (el agujero), reiniciar
+                            if (this.radius < 20) {
+                                this.reset();
+                            }
+                        }
+                        draw() {
+                            // Color más brillante en la punta, más oscuro en la cola (simulado por el rastro del canvas)
+                            ctx.fillStyle = '#0F0'; 
+                            ctx.font = fontSize + 'px monospace';
+                            ctx.fillText(this.char, this.x, this.y);
                         }
                     }
-                    setInterval(draw, 33);
+
+                    // Inicializar gotas
+                    for(let i = 0; i < numDrops; i++) {
+                        drops.push(new Drop());
+                    }
+
+                    function animate() {
+                        // Rastro semitransparente para el efecto de fluidez
+                        // Usamos un negro casi opaco (0.1) para que el rastro sea largo y fluido
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.1)';
+                        ctx.fillRect(0, 0, w, h);
+
+                        // Dibujar el "Agujero Negro" central para tapar el punto de fuga
+                        ctx.fillStyle = '#000';
+                        ctx.beginPath();
+                        ctx.arc(centerX, centerY, 20, 0, Math.PI * 2);
+                        ctx.fill();
+
+                        // Actualizar y dibujar cada gota
+                        drops.forEach(drop => {
+                            drop.update();
+                            drop.draw();
+                        });
+
+                        // Usar requestAnimationFrame para máxima fluidez y eficiencia
+                        requestAnimationFrame(animate);
+                    }
+
+                    // Iniciar animación
+                    animate();
+
+                    // Manejar redimensionado de ventana
                     window.addEventListener('resize', () => {
-                        canvas.width = window.innerWidth;
-                        canvas.height = window.innerHeight;
+                        w = canvas.width = window.innerWidth;
+                        h = canvas.height = window.innerHeight;
+                        centerX = w / 2;
+                        centerY = h / 2;
                     });
                 }
             }
 
-            // --- 2. REPRODUCTOR ---
+            // --- 2. REPRODUCTOR (El mismo código funcional de antes) ---
             const audio = document.getElementById('bg-music');
             const widget = document.getElementById('spotify-widget');
             const titleEl = document.getElementById('track-title');
@@ -154,10 +228,7 @@
             let currentSongIndex = 0;
             let isPlaying = false;
 
-            // Verificamos que existan los elementos del reproductor
             if (audio && widget && titleEl && artistEl && coverEl && playBtn) {
-                
-                // Configurar volumen inicial
                 audio.volume = 0.5;
 
                 function loadSong(index) {
@@ -168,7 +239,6 @@
                         artistEl.textContent = song.artist;
                         coverEl.src = song.image;
 
-                        // Reiniciar animación
                         if(coverContainer) {
                             coverContainer.classList.remove('pop-anim');
                             void coverContainer.offsetWidth; 
@@ -220,10 +290,7 @@
                 prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevSong(); });
                 audio.addEventListener('ended', nextSong);
 
-                // Carga inicial
                 loadSong(0);
-
-                // Autoplay seguro
                 const safeAutoplay = () => {
                     audio.play().then(() => {
                         isPlaying = true;
@@ -250,7 +317,7 @@
             flex-direction: column;
             align-items: center;
             overflow-x: hidden;
-            background-color: #000; /* Fondo Negro base */
+            background-color: #000; 
             padding-bottom: 100px;
         }
 
@@ -262,7 +329,8 @@
         .overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.3); z-index: -1;
+            /* Un overlay un poco más oscuro para que resalte el verde */
+            background: rgba(0, 0, 0, 0.5); z-index: -1;
         }
 
         /* WIDGET GRANDE */
