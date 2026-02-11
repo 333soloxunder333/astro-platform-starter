@@ -85,10 +85,61 @@
         <p>© 2024 AMS01 - Creado con Astro</p>
     </footer>
 
-    <script>
+    <script is:inline>
         // 1. CONFIGURACIÓN (CAMBIA TUS CANCIONES AQUÍ)
         const playlist = [
             {
                 title: "Vibe Coding", 
                 artist: "AMS01 Radio", 
-                file:
+                file: "/cancion.mp3",       
+                image: "/cover1.jpg"        
+            },
+            {
+                title: "Night City", 
+                artist: "Synthwave Mix", 
+                file: "/cancion2.mp3",
+                image: "/cover2.jpg"
+            },
+        ];
+
+        // 2. MATRIX
+        function initMatrix() {
+            const canvas = document.getElementById('matrix-bg');
+            if (!canvas) return;
+            const ctx = canvas.getContext('2d');
+            if (!ctx) return;
+
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            
+            const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+            const charArray = chars.split('');
+            const fontSize = 14;
+            const columns = window.innerWidth / fontSize;
+            const drops = [];
+            for(let i = 0; i < columns; i++) { drops[i] = 1; }
+
+            function draw() {
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = '#FFFFFF'; 
+                ctx.font = fontSize + 'px monospace';
+                for(let i = 0; i < drops.length; i++) {
+                    const text = charArray[Math.floor(Math.random() * charArray.length)];
+                    ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+                    if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                    drops[i]++;
+                }
+            }
+            setInterval(draw, 33);
+            window.addEventListener('resize', () => {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            });
+        }
+
+        // 3. REPRODUCTOR
+        function initPlayer() {
+            const audio = document.getElementById('bg-music');
+            const widget = document.getElementById('spotify-widget');
+            const title
