@@ -140,11 +140,11 @@
         if (audio && widget && audio instanceof HTMLAudioElement) {
             audio.volume = 0.5;
 
-            const startMusic = () => {
-                audio.play().then(() => {
-                    widget.classList.add('playing');
-                    document.removeEventListener('click', startMusic);
-                    document.removeEventListener('keydown', startMusic);
+            const playlist = [
+    { title: "Nombre Canción 1", artist: "Artista 1", file: "/cancion1.mp3" },
+    { title: "Nombre Canción 2", artist: "Artista 2", file: "/cancion2.mp3" },
+    // Añade tantas como quieras...
+];
                 }).catch(e => {
                     console.log("Esperando interacción...");
                 });
