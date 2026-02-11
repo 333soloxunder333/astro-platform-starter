@@ -15,18 +15,26 @@
 
     <div class="overlay"></div>
 
-    <audio id="bg-music" loop>
-        <source src="/cancion.mp3" type="audio/mpeg">
-    </audio>
+    <audio id="bg-music" preload="auto"></audio>
 
     <div class="spotify-widget" id="spotify-widget">
         <div class="spotify-icon">
             <i class="fa-brands fa-spotify"></i>
         </div>
-        <div class="spotify-info">
-            <span class="song-title">Vibe Coding</span>
-            <span class="song-artist">AMS01 Radio</span>
+        
+        <div class="spotify-content">
+            <div class="spotify-info">
+                <span class="song-title" id="track-title">Cargando...</span>
+                <span class="song-artist" id="track-artist">...</span>
+            </div>
+            
+            <div class="spotify-controls">
+                <button id="prev-btn" class="control-btn"><i class="fa-solid fa-backward-step"></i></button>
+                <button id="play-btn" class="control-btn play-pause"><i class="fa-solid fa-play"></i></button>
+                <button id="next-btn" class="control-btn"><i class="fa-solid fa-forward-step"></i></button>
+            </div>
         </div>
+
         <div class="spotify-visualizer">
             <div class="bar"></div>
             <div class="bar"></div>
@@ -35,7 +43,6 @@
     </div>
 
     <main class="card profile-card">
-        
         <div class="avatar-container">
             <img src="/perfil.jpg" alt="Mi Foto" class="avatar">
             <div class="status-indicator online" title="En línea"></div>
@@ -49,11 +56,9 @@
 
         <div class="social-links">
             <a href="#" target="_blank"><i class="fa-brands fa-x-twitter"></i></a>
-            
             <a href="https://www.instagram.com/xunder999?igsh=ZXR3N3luNTh0eWxm" target="_blank">
                 <i class="fa-brands fa-instagram"></i>
             </a>
-
             <a href="#" target="_blank"><i class="fa-brands fa-github"></i></a>
             <a href="#" target="_blank"><i class="fa-brands fa-twitch"></i></a>
         </div>
@@ -62,7 +67,6 @@
             <p>Galería IA</p>
             <i class="fa-solid fa-chevron-down"></i>
         </div>
-
     </main>
 
     <section class="card gallery-card">
@@ -70,18 +74,10 @@
         <p class="subtitle">Colección personal de generaciones</p>
         
         <div class="gallery-grid">
-            <div class="gallery-item">
-                <img src="/ia1.jpg" alt="Arte IA 1" loading="lazy">
-            </div>
-            <div class="gallery-item">
-                <img src="/ia2.jpg" alt="Arte IA 2" loading="lazy">
-            </div>
-            <div class="gallery-item">
-                <img src="/ia3.jpg" alt="Arte IA 3" loading="lazy">
-            </div>
-            <div class="gallery-item">
-                <img src="/ia4.jpg" alt="Arte IA 4" loading="lazy">
-            </div>
+            <div class="gallery-item"><img src="/ia1.jpg" alt="Arte IA 1" loading="lazy"></div>
+            <div class="gallery-item"><img src="/ia2.jpg" alt="Arte IA 2" loading="lazy"></div>
+            <div class="gallery-item"><img src="/ia3.jpg" alt="Arte IA 3" loading="lazy"></div>
+            <div class="gallery-item"><img src="/ia4.jpg" alt="Arte IA 4" loading="lazy"></div>
         </div>
     </section>
 
@@ -90,71 +86,154 @@
     </footer>
 
     <script>
-        // --- LÓGICA MATRIX (FONDO) ---
-        // Usamos HTMLCanvasElement para ayudar al tipado si fuera TS, pero aquí usamos 'if' defensivo
-        const canvas = document.getElementById('matrix-bg');
-        
-        if (canvas && canvas instanceof HTMLCanvasElement) {
-            const ctx = canvas.getContext('2d');
-            
-            if (ctx) {
-                canvas.width = window.innerWidth;
-                canvas.height = window.innerHeight;
+        // --- CONFIGURACIÓN DE CANCIONES (¡EDITA ESTO!) ---
+        const playlist = [
+            {
+                title: "Vibe Coding", 
+                artist: "AMS01 Radio", 
+                file: "/cancion.mp3" // Archivo en carpeta public
+            },
+            {
+                title: "Night City", 
+                artist: "Synthwave Mix", 
+                file: "/cancion2.mp3" // Archivo en carpeta public
+            }
+        ];
 
-                const chars = 'アァカサタナハマヤャラワガザダバパイィキシチニヒミリギジヂビピウゥクスツヌフムユュルグズブヅプ0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-                const charArray = chars.split('');
-                const fontSize = 14;
-                const columns = canvas.width / fontSize;
+        // Ejecutar todo solo cuando el navegador haya cargado (evita errores de servidor)
+        document.addEventListener('DOMContentLoaded', () => {
 
-                const drops = [];
-                for(let i = 0; i < columns; i++) { drops[i] = 1; }
-
-                function draw() {
-                    if (!ctx || !canvas) return;
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.fillStyle = '#FFFFFF'; 
-                    ctx.font = fontSize + 'px monospace';
-                    for(let i = 0; i < drops.length; i++) {
-                        const text = charArray[Math.floor(Math.random() * charArray.length)];
-                        ctx.fillText(text, i*fontSize, drops[i]*fontSize);
-                        if(drops[i]*fontSize > canvas.height && Math.random() > 0.975)
-                            drops[i] = 0;
-                        drops[i]++;
-                    }
-                }
-                setInterval(draw, 33);
-                
-                window.addEventListener('resize', () => {
+            // --- LÓGICA MATRIX ---
+            const canvas = document.getElementById('matrix-bg');
+            // Verificación simple para evitar error en build
+            if (canvas) {
+                const ctx = canvas.getContext('2d');
+                if (ctx) {
                     canvas.width = window.innerWidth;
                     canvas.height = window.innerHeight;
-                });
+                    const chars = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+                    const charArray = chars.split('');
+                    const fontSize = 14;
+                    const columns = canvas.width / fontSize;
+                    const drops = [];
+                    for(let i = 0; i < columns; i++) { drops[i] = 1; }
+
+                    function draw() {
+                        ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
+                        ctx.fillRect(0, 0, canvas.width, canvas.height);
+                        ctx.fillStyle = '#FFFFFF'; 
+                        ctx.font = fontSize + 'px monospace';
+                        for(let i = 0; i < drops.length; i++) {
+                            const text = charArray[Math.floor(Math.random() * charArray.length)];
+                            ctx.fillText(text, i*fontSize, drops[i]*fontSize);
+                            if(drops[i]*fontSize > canvas.height && Math.random() > 0.975) drops[i] = 0;
+                            drops[i]++;
+                        }
+                    }
+                    setInterval(draw, 33);
+                    window.addEventListener('resize', () => {
+                        canvas.width = window.innerWidth;
+                        canvas.height = window.innerHeight;
+                    });
+                }
             }
-        }
 
-        // --- LÓGICA SPOTIFY / MÚSICA ---
-        // Verificamos que los elementos existan antes de usarlos
-        const audio = document.getElementById('bg-music');
-        const widget = document.getElementById('spotify-widget');
-        
-        if (audio && widget && audio instanceof HTMLAudioElement) {
-            audio.volume = 0.5;
+            // --- LÓGICA REPRODUCTOR DE MÚSICA ---
+            const audio = document.getElementById('bg-music');
+            const widget = document.getElementById('spotify-widget');
+            const titleEl = document.getElementById('track-title');
+            const artistEl = document.getElementById('track-artist');
+            const playBtn = document.getElementById('play-btn');
+            const prevBtn = document.getElementById('prev-btn');
+            const nextBtn = document.getElementById('next-btn');
 
-            const playlist = [
-    { title: "Nombre Canción 1", artist: "Artista 1", file: "/cancion1.mp3" },
-    { title: "Nombre Canción 2", artist: "Artista 2", file: "/cancion2.mp3" },
-    // Añade tantas como quieras...
-];
-                }).catch(e => {
-                    console.log("Esperando interacción...");
-                });
-            };
+            let currentSongIndex = 0;
+            let isPlaying = false;
 
-            // Intentar reproducir
-            startMusic();
-            document.addEventListener('click', startMusic);
-            document.addEventListener('keydown', startMusic);
-        }
+            // Verificación simple: si existen los elementos, ejecutamos
+            if (audio && widget && titleEl && artistEl && playBtn) {
+                
+                audio.volume = 0.5;
+
+                function loadSong(index) {
+                    if (index >= 0 && index < playlist.length) {
+                        const song = playlist[index];
+                        audio.src = song.file;
+                        titleEl.textContent = song.title;
+                        artistEl.textContent = song.artist;
+                    }
+                }
+
+                function updatePlayButton() {
+                    const icon = playBtn.querySelector('i');
+                    if (isPlaying) {
+                        widget.classList.add('playing');
+                        icon.classList.remove('fa-play');
+                        icon.classList.add('fa-pause');
+                    } else {
+                        widget.classList.remove('playing');
+                        icon.classList.remove('fa-pause');
+                        icon.classList.add('fa-play');
+                    }
+                }
+
+                function togglePlay() {
+                    if (audio.paused) {
+                        audio.play().then(() => {
+                            isPlaying = true;
+                            updatePlayButton();
+                        }).catch(e => console.log("Interacción requerida para audio"));
+                    } else {
+                        audio.pause();
+                        isPlaying = false;
+                        updatePlayButton();
+                    }
+                }
+
+                function nextSong() {
+                    currentSongIndex = (currentSongIndex + 1) % playlist.length;
+                    loadSong(currentSongIndex);
+                    if (isPlaying) {
+                        audio.play().catch(e => console.log("Error reproducción"));
+                    }
+                }
+
+                function prevSong() {
+                    currentSongIndex = (currentSongIndex - 1 + playlist.length) % playlist.length;
+                    loadSong(currentSongIndex);
+                    if (isPlaying) {
+                        audio.play().catch(e => console.log("Error reproducción"));
+                    }
+                }
+
+                // Listeners
+                playBtn.addEventListener('click', (e) => { e.stopPropagation(); togglePlay(); });
+                nextBtn.addEventListener('click', (e) => { e.stopPropagation(); nextSong(); });
+                prevBtn.addEventListener('click', (e) => { e.stopPropagation(); prevSong(); });
+                
+                // Auto siguiente canción
+                audio.addEventListener('ended', nextSong);
+
+                // Cargar inicial
+                loadSong(currentSongIndex);
+
+                // Autoplay seguro
+                const safeAutoplay = () => {
+                    audio.play().then(() => {
+                        isPlaying = true;
+                        updatePlayButton();
+                        document.removeEventListener('click', safeAutoplay);
+                        document.removeEventListener('keydown', safeAutoplay);
+                    }).catch(() => {
+                        // Silencioso, espera click
+                    });
+                };
+
+                safeAutoplay();
+                document.addEventListener('click', safeAutoplay);
+                document.addEventListener('keydown', safeAutoplay);
+            }
+        });
     </script>
 
     <style>
@@ -169,7 +248,7 @@
             align-items: center;
             overflow-x: hidden;
             background-color: #000;
-            padding-bottom: 50px;
+            padding-bottom: 80px;
         }
 
         #matrix-bg {
@@ -183,7 +262,7 @@
             background: rgba(0, 0, 0, 0.3); z-index: -1;
         }
 
-        /* WIDGET SPOTIFY */
+        /* --- WIDGET SPOTIFY --- */
         .spotify-widget {
             position: fixed;
             bottom: 20px;
@@ -191,72 +270,115 @@
             background: rgba(0, 0, 0, 0.85);
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 20px;
-            border-radius: 30px;
+            padding: 10px 15px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            gap: 12px;
             z-index: 1000;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
-            transition: transform 0.3s ease, border-color 0.3s ease;
-            max-width: 90%;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.6);
+            transition: all 0.3s ease;
+            max-width: 300px;
+            min-width: 240px;
         }
 
         .spotify-widget:hover {
-            transform: scale(1.05);
             border-color: #1DB954;
+            transform: translateY(-2px);
         }
 
         .spotify-icon {
-            font-size: 1.8rem;
-            color: #1DB954; 
+            font-size: 2rem;
+            color: #1DB954;
+            display: flex;
+            align-items: center;
+        }
+
+        .spotify-content {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            gap: 4px;
         }
 
         .spotify-info {
-            display: flex;
-            flex-direction: column;
-            line-height: 1.2;
+            line-height: 1.1;
         }
 
         .song-title {
             font-weight: 700;
-            font-size: 0.95rem;
+            font-size: 0.9rem;
             color: white;
+            display: block;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 140px;
         }
 
         .song-artist {
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             color: #b3b3b3;
+            display: block;
         }
+
+        .spotify-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 2px;
+        }
+
+        .control-btn {
+            background: none;
+            border: none;
+            color: #b3b3b3;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: color 0.2s;
+            padding: 2px;
+        }
+
+        .control-btn:hover { color: white; }
+
+        .play-pause {
+            color: white;
+            font-size: 1rem;
+            width: 25px;
+            text-align: center;
+        }
+
+        .play-pause:hover { transform: scale(1.1); }
 
         .spotify-visualizer {
             display: flex;
             align-items: flex-end;
-            gap: 3px;
-            height: 15px;
+            gap: 2px;
+            height: 12px;
             margin-left: 5px;
+            margin-bottom: 5px;
         }
 
         .bar {
             width: 3px;
             background-color: #1DB954;
-            height: 3px;
+            height: 2px;
             border-radius: 2px;
         }
 
         .spotify-widget.playing .bar {
-            animation: bounceBars 1s infinite ease-in-out;
+            animation: bounceBars 0.8s infinite ease-in-out;
         }
         .spotify-widget.playing .bar:nth-child(1) { animation-delay: 0.0s; }
         .spotify-widget.playing .bar:nth-child(2) { animation-delay: 0.2s; }
         .spotify-widget.playing .bar:nth-child(3) { animation-delay: 0.4s; }
 
         @keyframes bounceBars {
-            0%, 100% { height: 3px; }
-            50% { height: 15px; }
+            0%, 100% { height: 2px; }
+            50% { height: 12px; }
         }
 
-        /* TARJETAS */
+        /* --- RESTO --- */
         .card {
             background: rgba(20, 20, 20, 0.85);
             border-radius: 20px;
@@ -271,30 +393,16 @@
             animation: fadeIn 1s ease-out;
         }
 
-        .profile-card {
-            margin-top: 8vh;
-            margin-bottom: 30px;
-        }
-
-        .gallery-card {
-            padding: 20px;
-        }
-
-        .gallery-card h2 {
-            font-size: 1.5rem;
-            margin-bottom: 5px;
-        }
-        .subtitle {
-            color: #bbb;
-            font-size: 0.8rem; margin-bottom: 20px;
-        }
+        .profile-card { margin-top: 8vh; margin-bottom: 30px; }
+        .gallery-card { padding: 20px; }
+        .gallery-card h2 { font-size: 1.5rem; margin-bottom: 5px; }
+        .subtitle { color: #bbb; font-size: 0.8rem; margin-bottom: 20px; }
 
         .gallery-grid {
             display: grid;
             grid-template-columns: 1fr 1fr;
             gap: 15px;
         }
-
         .gallery-item {
             overflow: hidden;
             border-radius: 10px;
@@ -302,41 +410,23 @@
             transition: transform 0.3s ease;
             aspect-ratio: 1 / 1;
         }
-
         .gallery-item img {
-            width: 100%;
-            height: 100%; object-fit: cover;
-            transition: transform 0.5s ease;
+            width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease;
         }
-
-        .gallery-item:hover {
-            transform: scale(1.02);
-            border-color: #ffffff;
-        }
-        .gallery-item:hover img {
-            transform: scale(1.1);
-        }
+        .gallery-item:hover { transform: scale(1.02); border-color: #ffffff; }
+        .gallery-item:hover img { transform: scale(1.1); }
 
         .scroll-indicator {
-            margin-top: 30px;
-            color: #888;
-            font-size: 0.9rem;
-            animation: bounce 2s infinite;
+            margin-top: 30px; color: #888; font-size: 0.9rem; animation: bounce 2s infinite;
         }
         .scroll-indicator i { margin-top: 5px; display: block; }
 
-        .avatar-container {
-            position: relative;
-            width: 120px; margin: 0 auto 20px;
-        }
+        .avatar-container { position: relative; width: 120px; margin: 0 auto 20px; }
         .avatar {
-            width: 120px;
-            height: 120px; border-radius: 50%; object-fit: cover;
-            border: 3px solid #ffffff;
+            width: 120px; height: 120px; border-radius: 50%; object-fit: cover; border: 3px solid #ffffff;
         }
         .status-indicator {
-            position: absolute;
-            bottom: 5px; right: 5px; width: 25px; height: 25px;
+            position: absolute; bottom: 5px; right: 5px; width: 25px; height: 25px;
             border-radius: 50%; border: 3px solid #1a1a1a;
         }
         .online { background-color: #43b581; }
@@ -344,19 +434,12 @@
         h1 { margin-bottom: 10px; font-size: 2rem; letter-spacing: 1px; }
         
         .discord-status {
-            color: #b9bbbe;
-            margin-bottom: 25px; font-size: 0.9rem;
+            color: #b9bbbe; margin-bottom: 25px; font-size: 0.9rem;
             display: flex; align-items: center; justify-content: center; gap: 8px;
         }
 
-        .social-links {
-            margin-bottom: 30px;
-            display: flex; justify-content: center; gap: 25px;
-        }
-        .social-links a {
-            color: #bbb;
-            font-size: 1.6rem; transition: all 0.3s;
-        }
+        .social-links { margin-bottom: 30px; display: flex; justify-content: center; gap: 25px; }
+        .social-links a { color: #bbb; font-size: 1.6rem; transition: all 0.3s; }
         .social-links a:hover { color: white; transform: scale(1.1); }
 
         footer { margin-top: 20px; color: #555; font-size: 0.7rem; }
@@ -369,6 +452,15 @@
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(20px); }
             to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 480px) {
+            .spotify-widget {
+                left: 50%;
+                transform: translateX(-50%);
+                bottom: 15px;
+                width: 90%;
+            }
         }
     </style>
 </body>
